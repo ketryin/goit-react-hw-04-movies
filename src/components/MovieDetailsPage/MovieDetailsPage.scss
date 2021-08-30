@@ -19,10 +19,11 @@
   .detailsContainer {
     padding: 0 20px;
     margin-bottom: 20px;
-    border-bottom: 2px solid #909191;
   }
   .detailsBox {
     display: flex;
+    border-bottom: 2px solid #909191;
+    padding-bottom: 5px;
   }
   .posterBox {
     margin-right: 20px;
@@ -53,21 +54,31 @@
     margin: 0;
   }
   .navLink {
-    // display: inline-block;
+    display: inline-block;
     color: inherit;
     font-size: 30px;
     text-decoration: none;
-    padding: 20px 0;
   
     transition: color 250ms ease;
   
     &:not(:last-child) {
       margin-right: 30px;
     }
+    &:hover {
+      color: red;
+    } 
+
   }
   .navLinkActive {
     color: red;
   }
   .additionalDetailsText {
     margin: 0;
+  }
+  .additional{
+    font-weight: bold;
+  }
+  .box{
+    border-bottom: 2px solid #909191;
+    padding-bottom: 5px;
   }

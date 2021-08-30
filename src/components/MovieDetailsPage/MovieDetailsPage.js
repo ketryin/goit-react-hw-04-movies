@@ -1,35 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Route, useParams, withRouter } from 'react-router-dom';
 import {fetchMovieDetails, fetchMovieCredits, fetchMovieReviews} from '../../services/movies-api';
+import Cast from '../Cast/Cast';
+import Reviews from '../Reviews/Reviews';
 import './MovieDetailsPage.scss';
 
-function MovieDetailsPage ({location, history}) {
+function MovieDetailsPage ({location, history, match}) {
 
     const { id } = useParams();
 
     const [movieId, setMovieId] = useState(id);
-    const [movie, setMovie] = useState({genres:[]});
-    // const [cast, setCast] = useState([]);
-    // const [reviews, setReviews] = useState([]);
+    const [movie, setMovie] = useState();
+    const [cast, setCast] = useState([]);
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
 
         async function fetchMovieWithCreditsAndReviews() {
 
-            const data = await fetchMovieDetails(movieId);
-            const { title, overview, genres, poster_path, vote_average } = data;
+          if (movie) {
+            return;
+          }
 
-            setMovie({
-                poster: poster_path,
-                title,
-                userScore: vote_average,
-                overview,
-                genres,
-              });
+          const details = await fetchMovieDetails(movieId);
+          const { title, overview, genres, poster_path, vote_average } = details;
+
+          setMovie({
+              poster: poster_path,
+              title,
+              userScore: vote_average,
+              overview,
+              genres,
+            });
+          
+          const movieCredits = await fetchMovieCredits(movieId);
+          setCast(movieCredits.cast.map(({ cast_id, name, character, profile_path }) => ({
+            name,
+            character,
+            photo: profile_path,
+            id: cast_id,
+          })));
+
+          const movieReviews = await fetchMovieReviews(movieId);
+          setReviews(movieReviews.results.map(({ author, id, content }) => ({ author, id, text: content })));
         }
 
         fetchMovieWithCreditsAndReviews();
-    });
+    }, [movie, setMovie]);
 
   const handleExit = () => {
     const { state } = location;
@@ -43,6 +60,7 @@ function MovieDetailsPage ({location, history}) {
     history.push(from);
   };
 
+
     return (
       <div className="detailsContainer">
         <button className="returnButton" type="button" onClick={handleExit}>
@@ -50,19 +68,19 @@ function MovieDetailsPage ({location, history}) {
         </button>
         <div className="detailsBox">
           <div className="posterBox">
-            {movie.poster && <img src={`https://image.tmdb.org/t/p/w300${movie.poster}`} alt={movie.title} />}
+            {movie?.poster && <img src={`https://image.tmdb.org/t/p/w300${movie?.poster}`} alt={movie?.title} />}
           </div>
           <div>
-            <h1 className="detailsTitle">{movie.title}</h1>
+            <h1 className="detailsTitle">{movie?.title}</h1>
             <p className="detailsText">
               <span className="detailsAccent">User score: </span>
-              {movie.userScore}
+              {movie?.userScore}
             </p>
             <h2 className="detailsSubtitle">Overview</h2>
-            <p className="detailsText">{movie.overview}</p>
+            <p className="detailsText">{movie?.overview}</p>
             <h2 className="detailsSubtitle">Genres</h2>
-            <ul className="GenresList">
-              {movie.genres.map(({ name }) => (
+            <ul className="GenresList"> 
+              {movie?.genres?.map(({ name }) => (
                 <li className="genreItem" key={name}>
                   <p className="genreName">{name}</p>
                 </li>
@@ -70,15 +88,16 @@ function MovieDetailsPage ({location, history}) {
             </ul>
           </div>
         </div>
-        <div>
-          {/* <NavLink
+        <div className="box">
+          <p className="additional">Additional information</p>
+          <NavLink
             className="navLink"
             activeClassName="navLinkActive"
             to={{
               pathname: `${match.url}/cast`,
               state: {
                 from: {
-                  ...this.props.location.state.from,
+                  ...location.state.from,
                 },
               },
             }}
@@ -92,15 +111,20 @@ function MovieDetailsPage ({location, history}) {
               pathname: `${match.url}/reviews`,
               state: {
                 from: {
-                  ...this.props.location.state.from,
+                  ...location.state.from,
                 },
               },
             }}
           >
             <p className="additionalDetailsText">Reviews</p>
-          </NavLink> */}
+          </NavLink>
         </div>
-
+        
+        <Route path={`${match.path}/cast`} render={props => <Cast {...props} cast={cast} />} />
+        <Route
+          path={`${match.path}/reviews`}
+          render={props => <Reviews {...props} reviews={reviews} />}
+        />
       </div>
     );
 }

@@ -1,17 +1,22 @@
-import { Switch, Route } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import {  Route } from 'react-router-dom';
 import AppBar from './components/AppBar/AppBar';
 import Container from './components/Container/Container';
-import HomeView from './views/HomeView';
-import MoviesView from './views/MoviesView';
-import MovieDetailsPage from "./components/MovieDetailsPage/MovieDetailsPage";
 
+const HomeView = lazy(() => import('./views/HomeView'));
+const MoviesView = lazy(() =>
+  import('./views/MoviesView'),
+);
+const MovieDetailsPage = lazy(() =>
+  import('./components/MovieDetailsPage/MovieDetailsPage'),
+);
 
 export default function App() {
   return (
     <Container>
       <AppBar />
 
-      <Switch>
+      <Suspense fallback={<h1>Загружаем...</h1>}>
         <Route path="/" exact>
           <HomeView />
         </Route>
@@ -21,7 +26,7 @@ export default function App() {
         <Route path="/movies/:id">
           <MovieDetailsPage />
         </Route>
-      </Switch>
+        </Suspense>
     </Container>
   );
 }

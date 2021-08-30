@@ -9,7 +9,7 @@ function MovieDetailsPage ({location, history, match}) {
 
     const { id } = useParams();
 
-    const [movieId, setMovieId] = useState(id);
+    const [movieId, _] = useState(id);
     const [movie, setMovie] = useState();
     const [cast, setCast] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -97,7 +97,7 @@ function MovieDetailsPage ({location, history, match}) {
               pathname: `${match.url}/cast`,
               state: {
                 from: {
-                  ...location.state.from,
+                  ...location?.state?.from,
                 },
               },
             }}
@@ -111,7 +111,7 @@ function MovieDetailsPage ({location, history, match}) {
               pathname: `${match.url}/reviews`,
               state: {
                 from: {
-                  ...location.state.from,
+                  ...location?.state?.from,
                 },
               },
             }}

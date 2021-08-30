@@ -16,7 +16,7 @@ export default function App() {
     <Container>
       <AppBar />
 
-      <Suspense fallback={<h1>Загружаем...</h1>}>
+      <Suspense fallback={<h1>Loading...</h1>}>
         <Route path="/" exact>
           <HomeView />
         </Route>
